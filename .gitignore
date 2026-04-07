@@ -13,3 +13,4 @@ arb_bot.db
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+data/legacy/*.json
