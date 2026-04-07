@@ -119,3 +119,142 @@ def test_paper_open_rejection_returns_400_and_logs_event(monkeypatch) -> None:
     assert logged[0]["event_type"] == "paper_open"
     assert logged[0]["status"] == "error"
     assert logged[0]["error"] == "paper open blocked"
+
+
+def test_prepare_trade_success_returns_payload_and_logs_event(monkeypatch) -> None:
+    client = TestClient(server.app)
+    logged: list[dict] = []
+
+    def fake_prepare_trade(symbol: str, hours: int, notional: float, run_id: str) -> dict:
+        assert symbol == "BTC"
+        assert hours == 24
+        assert notional == 500.0
+        assert run_id == "run-prepare"
+        return {"plan_id": "plan-123", "status": "ok", "symbol": symbol}
+
+    def fake_log_structured_event(event_type: str, **payload) -> None:
+        logged.append({"event_type": event_type, **payload})
+
+    monkeypatch.setattr(server.bot, "prepare_trade", fake_prepare_trade)
+    monkeypatch.setattr(server, "log_structured_event", fake_log_structured_event)
+    monkeypatch.setattr(server, "new_run_id", lambda: "run-prepare")
+
+    response = client.post(
+        "/api/prepare-trade",
+        json={"symbol": "BTC", "hours": 24, "notional": 500.0},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "ok": True,
+        "data": {"plan_id": "plan-123", "status": "ok", "symbol": "BTC"},
+    }
+    assert logged[0]["event_type"] == "prepare_trade"
+    assert logged[0]["status"] == "ok"
+    assert logged[0]["result"]["plan_id"] == "plan-123"
+
+
+def test_prepare_trade_rejection_returns_400_and_logs_event(monkeypatch) -> None:
+    client = TestClient(server.app)
+    logged: list[dict] = []
+
+    def fake_prepare_trade(symbol: str, hours: int, notional: float, run_id: str) -> dict:
+        raise SystemExit("trade rejected")
+
+    def fake_log_structured_event(event_type: str, **payload) -> None:
+        logged.append({"event_type": event_type, **payload})
+
+    monkeypatch.setattr(server.bot, "prepare_trade", fake_prepare_trade)
+    monkeypatch.setattr(server, "log_structured_event", fake_log_structured_event)
+    monkeypatch.setattr(server, "new_run_id", lambda: "run-prepare-reject")
+
+    response = client.post(
+        "/api/prepare-trade",
+        json={"symbol": "BTC", "hours": 24, "notional": 500.0},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "trade rejected"
+    assert logged[0]["event_type"] == "prepare_trade_rejected"
+    assert logged[0]["status"] == "error"
+    assert logged[0]["error"] == "trade rejected"
+
+
+def test_execute_trade_requires_explicit_confirm_flag() -> None:
+    client = TestClient(server.app)
+
+    response = client.post("/api/execute-trade", json={"plan_id": "plan-123", "confirm": False})
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Must confirm with confirm=True"
+
+
+def test_execute_trade_success_logs_ok_status(monkeypatch) -> None:
+    client = TestClient(server.app)
+    logged: list[dict] = []
+
+    def fake_execute_trade(plan_id: str, run_id: str) -> dict:
+        assert plan_id == "plan-123"
+        assert run_id == "run-execute"
+        return {"status": "ok", "execution_id": "exec-1"}
+
+    def fake_log_structured_event(event_type: str, **payload) -> None:
+        logged.append({"event_type": event_type, **payload})
+
+    monkeypatch.setattr(server.bot, "execute_trade", fake_execute_trade)
+    monkeypatch.setattr(server, "log_structured_event", fake_log_structured_event)
+    monkeypatch.setattr(server, "new_run_id", lambda: "run-execute")
+
+    response = client.post("/api/execute-trade", json={"plan_id": "plan-123", "confirm": True})
+
+    assert response.status_code == 200
+    assert response.json() == {"ok": True, "data": {"status": "ok", "execution_id": "exec-1"}}
+    assert logged[0]["event_type"] == "execute_trade"
+    assert logged[0]["status"] == "ok"
+    assert logged[0]["warnings"] == []
+
+
+def test_execute_trade_degraded_status_logs_warning(monkeypatch) -> None:
+    client = TestClient(server.app)
+    logged: list[dict] = []
+
+    def fake_execute_trade(plan_id: str, run_id: str) -> dict:
+        return {"status": "partial_fill", "execution_id": "exec-2"}
+
+    def fake_log_structured_event(event_type: str, **payload) -> None:
+        logged.append({"event_type": event_type, **payload})
+
+    monkeypatch.setattr(server.bot, "execute_trade", fake_execute_trade)
+    monkeypatch.setattr(server, "log_structured_event", fake_log_structured_event)
+    monkeypatch.setattr(server, "new_run_id", lambda: "run-execute-degraded")
+
+    response = client.post("/api/execute-trade", json={"plan_id": "plan-123", "confirm": True})
+
+    assert response.status_code == 200
+    assert response.json()["data"]["status"] == "partial_fill"
+    assert logged[0]["event_type"] == "execute_trade"
+    assert logged[0]["status"] == "degraded"
+    assert logged[0]["warnings"] == ["execute_trade_status_partial_fill"]
+
+
+def test_execute_trade_rejection_returns_400_and_logs_event(monkeypatch) -> None:
+    client = TestClient(server.app)
+    logged: list[dict] = []
+
+    def fake_execute_trade(plan_id: str, run_id: str) -> dict:
+        raise SystemExit("kill switch active")
+
+    def fake_log_structured_event(event_type: str, **payload) -> None:
+        logged.append({"event_type": event_type, **payload})
+
+    monkeypatch.setattr(server.bot, "execute_trade", fake_execute_trade)
+    monkeypatch.setattr(server, "log_structured_event", fake_log_structured_event)
+    monkeypatch.setattr(server, "new_run_id", lambda: "run-execute-reject")
+
+    response = client.post("/api/execute-trade", json={"plan_id": "plan-123", "confirm": True})
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "kill switch active"
+    assert logged[0]["event_type"] == "execute_trade_rejected"
+    assert logged[0]["status"] == "error"
+    assert logged[0]["error"] == "kill switch active"
