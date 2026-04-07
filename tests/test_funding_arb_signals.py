@@ -2,7 +2,6 @@ import pytest
 
 from funding_arb_bot import build_pair_details, calc_signal, pair_series
 
-
 BASE_CFG = {
     "scan": {
         "pair_max_gap_minutes": 10,
