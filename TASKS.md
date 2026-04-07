@@ -2,9 +2,9 @@
 
 ## Now
 
-- [ ] Crear una base de tests unitarios con `pytest` para logica pura del bot
-- [ ] Agregar `docs/TESTING.md` con distincion entre tests seguros y tests contra entorno vivo
-- [ ] Definir una convención de ramas y PRs para trabajo con varios LLMs
+- [ ] Agregar tests unitarios para calculo de señales y helpers de payload en `funding_arb_bot.py`
+- [ ] Agregar tests de integracion local de FastAPI con DB temporal
+- [ ] Definir una convención de ramas/worktrees para trabajo con varios LLMs
 
 ## Next
 

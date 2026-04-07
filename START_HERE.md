@@ -23,8 +23,9 @@ Leé en este orden:
 1. `AGENTS.md`
 2. `CURRENT_STATE.md`
 3. `TASKS.md`
-4. `docs/ARCHITECTURE.md`
-5. `docs/TESTING.md`
+4. `MEMORY.md`
+5. `docs/ARCHITECTURE.md`
+6. `docs/TESTING.md`
 
 ## 3. Archivos principales del sistema
 
@@ -52,6 +53,16 @@ El proyecto esta en una etapa `v0.5` funcional con:
 - kill switch
 
 La prioridad actual no es inventar features al azar, sino mejorar workflow, testing y preparar el camino a `v0.6`.
+
+## 5.1 Qué hacer primero al entrar
+
+Si no tenés una tarea explícita:
+
+1. leer `CURRENT_STATE.md`
+2. tomar un ítem de `TASKS.md`
+3. elegir el cambio más chico que mueva ese ítem
+4. correr la verificación mínima necesaria
+5. actualizar docs si cambió el estado real
 
 ## 6. Comandos utiles
 
@@ -87,6 +98,7 @@ just smoke
 - Si tocás riesgo operativo, documentalo.
 - Si proponés algo grande, primero anotá el objetivo en `TASKS.md`.
 - No asumas acceso a secretos ni a entorno real si no está confirmado.
+- Si encontrás una restricción duradera del proyecto, escribila en `MEMORY.md`.
 
 ## 8. Qué entregar
 
