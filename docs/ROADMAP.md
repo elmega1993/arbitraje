@@ -2,7 +2,7 @@
 
 ## Estado actual
 
-Ultima revision: 2026-04-06
+Ultima revision: 2026-04-07
 
 Lectura honesta del proyecto hoy:
 
@@ -22,12 +22,16 @@ Resumen de lo que ya existe en codigo:
 - dashboard operativo interactivo con Kill Switch real-time
 - adapters de órdenes reales y dependencias (SDKs oficiales) implementados para HL y Lighter (`exchange_adapters.py`)
 - flujo de trade `prepare-trade` con cálculos L2 -> `execute-trade` (Market/IOC) con DB tracks
+- suite base de tests locales para helpers, señales y endpoints API críticos
+- workflow multi-agente y documentación operativa inicial dentro del repo
 
 Lo que sigue faltando para pasar a operaciones 100% reales desatendidas (v0.6+):
 
 - manejo de limit orders para reducir costos Taker
 - reconciliacion post-orden contra los balances absolutos del exchange
 - manejo de fill parcial real con hedge correctivo inteligente
+- alertas operativas si queda exposicion desnuda o ejecución degradada
+- replay/backtest simple para validar thresholds sin usar entorno real
 
 ## Checklist por version
 
@@ -128,7 +132,7 @@ Estado:
 - [x] tabla de oportunidades del bot
 - [x] vista de paper positions y tracking de PnL/funding/drift
 - [~] health y latencia visibles, pero todavia falta mas pulido operativo
-- [~] falta terminar de consolidar acciones y alertas en UI
+- [~] acciones y alertas básicas visibles, pero falta una capa más operativa para exposición degradada y reconciliación
 
 ## v0.5
 
@@ -164,6 +168,8 @@ Objetivo: primer real money controlado.
 - manejo de fill parcial con hedge correctivo
 - cierre manual asistido
 - alertas si queda exposicion desnuda
+- desglose y auditoria clara del costo total ejecutado
+- persistencia de fills reales y desvío contra el trade plan
 
 Entregable:
 
@@ -171,8 +177,38 @@ Entregable:
 
 Estado:
 
-- [ ] no iniciado
+- [ ] no iniciado a nivel funcional
+- [ ] parcialmente preparado a nivel de testing y observabilidad
 - [ ] depende de validar la primera ejecución v0.5 exitosa
+
+### Subfases recomendadas para v0.6
+
+#### v0.6-a Reconciliación post-trade
+
+- guardar fills reales por pata
+- consultar estado real de cuenta/posición después de ejecutar
+- comparar `trade_plan` vs ejecución real
+- persistir desvíos en SQLite
+
+#### v0.6-b Gestión de fill parcial real
+
+- detectar cuándo una pierna queda parcialmente abierta
+- marcar severidad de exposición
+- intentar hedge correctivo mínimo o dejar instrucción operativa explícita
+- registrar resultado del unwind o corrective hedge
+
+#### v0.6-c Alertas operativas
+
+- alertar si `unhedged` supera un umbral
+- alertar si `execute_trade` termina en estado degradado
+- alertar si un trade queda sin reconciliar
+- llevar estos estados al dashboard y al event log
+
+#### v0.6-d Replay / validación offline
+
+- usar históricos ya cacheados para replay básico
+- validar thresholds y señales sin tocar entorno real
+- usarlo para ajustar `hold_hours`, consistencia mínima y drawdown máximo
 
 ## v0.7
 
@@ -183,6 +219,7 @@ Objetivo: semi-auto.
 - pausas por volatilidad o APIs degradadas
 - limites diarios de perdida
 - limites por venue y por activo
+- smart execution inicial para reducir costo de entrada
 
 Entregable:
 
@@ -220,10 +257,22 @@ Tomando como referencia la arquitectura de Prop-Desks y bots avanzados como Humm
 - **Auto-Balancing Integrado (Protección a Liquidation):** Monitor de `maintenance_margin`. Si un lado de la posición desangra mucho capital y la otra gana de más, un Daemon mueve USDC (o levanta flags) para evitar "Rekt" del lado perdedor.
 - **Micro-predicciones Estructurales (L1/L2):** Añadir un componente de ML o inferencia simple (mirando Open Interest, imbalances de Order Books, o premia) para anticiparse a los picos de funding antes de que un bot ciego de historial lo vea.
 
+## Qué NO es prioridad ahora
+
+Aunque aparezcan en informes de referencia o frameworks externos, no son prioridad inmediata para este repo:
+
+- migrar todo a CCXT
+- arbitraje triangular
+- arbitraje estadístico/cointregración como estrategia principal
+- flash loans / arbitrage DeFi
+- reemplazar el dashboard actual por otra UI completa
+
+Todo eso puede ser válido más adelante, pero hoy el cuello de botella real está en ejecución controlada, reconciliación y gestión de riesgo post-trade.
+
 ## Prioridad recomendada HOY
 
-1. **Estás listo para correr tests reales de muy bajo notional (`v0.5`) apretando "Prepare Trade (Real)".**
-2. Pasar a `v0.6`: Conciliar tu SQLite local contra el exchange para cerrar posiciones y trackear PnL con saldo real de wallet.
-3. Crear hedge correctivo inteligente obligatoriamente para cubrirte si Lighter (que tiene poca liquidez a veces) no filleó la otra pata al 100%.
-4. Desarrollar la **Smart Execution (Maker-Taker Legging)** porque es lo que va a levantar la rentabilidad neta real. 
-5. Empezar a planear la v0.7 para automatizar entradas y el Auto-Unwind.
+1. Cerrar `v0.6-a`: reconciliación post-trade real contra exchange y SQLite.
+2. Cerrar `v0.6-b`: manejo de fill parcial real con hedge correctivo o unwind explícito.
+3. Cerrar `v0.6-c`: alertas operativas de exposición, ejecución degradada y estados no reconciliados.
+4. Agregar `v0.6-d`: replay/backtest simple para validar thresholds sin usar entorno real.
+5. Recién después avanzar a `Smart Execution (Maker-Taker Legging)` como puente a `v0.7`.
