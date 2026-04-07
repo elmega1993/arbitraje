@@ -11,12 +11,12 @@ import sys
 import threading
 import time
 import uuid
-from dataclasses import dataclass, asdict, replace
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from urllib import error, parse, request
-from exchange_adapters import get_adapter
 
+from exchange_adapters import get_adapter
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
@@ -1579,7 +1579,7 @@ class Bot:
                     )
                     final_status = "partial_unwind_attempted"
             else:
-                print(f"Pata 1 falló. No se ejecutará la pata 2.")
+                print("Pata 1 falló. No se ejecutará la pata 2.")
                 final_status = "failed"
 
             plan_db_status = "executed" if final_status == "ok" else final_status

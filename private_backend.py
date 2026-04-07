@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import asyncio
 import json
 import os
 import time
@@ -11,7 +10,6 @@ from eth_account import Account
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from hyperliquid.info import Info
-
 
 ROOT = Path(__file__).resolve().parent
 ENV_PATH = ROOT / ".env"

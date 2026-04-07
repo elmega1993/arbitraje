@@ -13,7 +13,6 @@ import os
 import signal
 import subprocess
 import sys
-import threading
 import time
 import webbrowser
 from pathlib import Path
@@ -90,8 +89,8 @@ def stop_all():
 
 def wait_for_server(port: int, timeout: int = 15) -> bool:
     """Wait until a server responds on the given port."""
-    import urllib.request
     import urllib.error
+    import urllib.request
     start = time.time()
     while time.time() - start < timeout:
         try:
@@ -106,13 +105,13 @@ def open_dashboard():
     """Open the dashboard in the default browser."""
     path = DASHBOARD.as_uri() if hasattr(DASHBOARD, 'as_uri') else f"file://{DASHBOARD}"
     webbrowser.open(path)
-    print(f"  🌐 Dashboard abierto en browser")
+    print("  🌐 Dashboard abierto en browser")
 
 
 def check_health() -> dict:
     """Quick health check of both servers."""
-    import urllib.request
     import json
+    import urllib.request
     status = {}
     for name, port in [("bot", BOT_SERVER_PORT), ("private", PRIVATE_SERVER_PORT)]:
         try:

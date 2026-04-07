@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 import asyncio
-import time
 import logging
+import time
 from dataclasses import asdict
 from typing import Any, Dict
 
-from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from funding_arb_bot import (
-    Bot,
     CONFIG_PATH,
-    command_paper_open,
+    HL_API,
+    Bot,
     command_paper_close,
+    command_paper_open,
     fetch_recent_error_logs,
     http_get_json,
     http_post_json,
@@ -23,7 +24,6 @@ from funding_arb_bot import (
     load_state,
     log_structured_event,
     new_run_id,
-    HL_API,
 )
 
 logging.basicConfig(
@@ -141,6 +141,7 @@ async def paper_open(req: PaperOpenRequest) -> Dict[str, Any]:
         await loop.run_in_executor(None, command_paper_open, args, bot, cfg)
         return {"ok": True, "message": f"Oppened paper position for {req.symbol}"}
     except SystemExit as exc:
+        error_message = str(exc)
         await loop.run_in_executor(
             None,
             lambda: log_structured_event(
@@ -149,11 +150,11 @@ async def paper_open(req: PaperOpenRequest) -> Dict[str, Any]:
                 status="error",
                 started_at=started_at,
                 event_input={"symbol": req.symbol, "hours": req.hours, "notional": req.notional, "force": req.force},
-                error=str(exc),
+                error=error_message,
                 meta={"via": "api"},
             ),
         )
-        raise HTTPException(status_code=400, detail=str(exc))
+        raise HTTPException(status_code=400, detail=error_message)
 
 class PaperCloseRequest(BaseModel):
     symbol: str
@@ -171,6 +172,7 @@ async def paper_close(req: PaperCloseRequest) -> Dict[str, Any]:
         await loop.run_in_executor(None, command_paper_close, args, bot)
         return {"ok": True, "message": f"Closed paper position for {req.symbol}"}
     except SystemExit as exc:
+        error_message = str(exc)
         await loop.run_in_executor(
             None,
             lambda: log_structured_event(
@@ -179,11 +181,11 @@ async def paper_close(req: PaperCloseRequest) -> Dict[str, Any]:
                 status="error",
                 started_at=started_at,
                 event_input={"symbol": req.symbol, "hours": req.hours},
-                error=str(exc),
+                error=error_message,
                 meta={"via": "api"},
             ),
         )
-        raise HTTPException(status_code=400, detail=str(exc))
+        raise HTTPException(status_code=400, detail=error_message)
 
 class PrepareTradeRequest(BaseModel):
     symbol: str
@@ -211,6 +213,7 @@ async def prepare_trade(req: PrepareTradeRequest) -> Dict[str, Any]:
         )
         return {"ok": True, "data": res}
     except SystemExit as exc:
+        error_message = str(exc)
         await loop.run_in_executor(
             None,
             lambda: log_structured_event(
@@ -219,11 +222,11 @@ async def prepare_trade(req: PrepareTradeRequest) -> Dict[str, Any]:
                 status="error",
                 started_at=started_at,
                 event_input={"symbol": req.symbol, "hours": req.hours, "notional": req.notional},
-                error=str(exc),
+                error=error_message,
                 meta={"via": "api"},
             ),
         )
-        raise HTTPException(status_code=400, detail=str(exc))
+        raise HTTPException(status_code=400, detail=error_message)
 
 class ExecuteTradeRequest(BaseModel):
     plan_id: str
@@ -253,6 +256,7 @@ async def execute_trade(req: ExecuteTradeRequest) -> Dict[str, Any]:
         )
         return {"ok": True, "data": res}
     except SystemExit as exc:
+        error_message = str(exc)
         await loop.run_in_executor(
             None,
             lambda: log_structured_event(
@@ -261,11 +265,11 @@ async def execute_trade(req: ExecuteTradeRequest) -> Dict[str, Any]:
                 status="error",
                 started_at=started_at,
                 event_input={"plan_id": req.plan_id, "confirm": req.confirm},
-                error=str(exc),
+                error=error_message,
                 meta={"via": "api"},
             ),
         )
-        raise HTTPException(status_code=400, detail=str(exc))
+        raise HTTPException(status_code=400, detail=error_message)
 
 class KillSwitchRequest(BaseModel):
     active: bool
