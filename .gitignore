@@ -1,0 +1,15 @@
+.env
+config.json
+__pycache__/
+.venv/
+*.pyc
+*.pyo
+*.log
+.bot_server.log
+.private_server.log
+bot_app.log
+logs/
+arb_bot.db
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#16213e"/>
+    </linearGradient>
+    <linearGradient id="arrow_up" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#00d2ff"/>
+      <stop offset="100%" stop-color="#3a7bd5"/>
+    </linearGradient>
+    <linearGradient id="arrow_down" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f7971e"/>
+      <stop offset="100%" stop-color="#ffd200"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="32" cy="32" r="30" fill="url(#bg)" stroke="#3a7bd5" stroke-width="2"/>
+  <!-- Up arrow (long) -->
+  <path d="M20 38 L20 22 L14 28 M20 22 L26 28" fill="none" stroke="url(#arrow_up)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Down arrow (short) -->
+  <path d="M44 26 L44 42 L38 36 M44 42 L50 36" fill="none" stroke="url(#arrow_down)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Dollar sign in center -->
+  <text x="32" y="38" text-anchor="middle" font-family="monospace" font-size="16" font-weight="bold" fill="#00ff88">$</text>
+</svg>

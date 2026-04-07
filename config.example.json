@@ -1,0 +1,53 @@
+{
+  "scan": {
+    "hours": 168,
+    "top": 12,
+    "hold_hours": 24,
+    "min_gross_apy": 10.0,
+    "min_net_apy": 3.0,
+    "min_consistency_pct": 65.0,
+    "max_drawdown_bps": 30.0,
+    "min_samples": 24,
+    "pair_max_gap_minutes": 10,
+    "liquidity_shortlist_multiplier": 3,
+    "scan_workers": 6,
+    "history_cache_ttl_sec": 300,
+    "history_stale_if_error_ttl_sec": 21600,
+    "orderbook_cache_ttl_sec": 15,
+    "orderbook_stale_if_error_ttl_sec": 180,
+    "scan_result_ttl_sec": 60
+  },
+  "execution": {
+    "default_notional_usd": 1000.0,
+    "max_notional_usd": 5000.0,
+    "max_leg_delay_sec": 8,
+    "entry_buffer_bps": 2.0,
+    "max_slippage_bps": 6.0,
+    "paper_maker_cutoff_bps": 0.5,
+    "paper_fill_penalty_per_bps": 0.08,
+    "paper_adverse_drift_bps_per_sec": 0.05,
+    "paper_repost_slippage_bps": 0.8,
+    "paper_max_retries_per_leg": 2,
+    "paper_maker_fill_bonus": 0.08
+  },
+  "costs": {
+    "hyperliquid_maker_entry_bps": 0.0,
+    "hyperliquid_entry_bps": 1.5,
+    "hyperliquid_exit_bps": 1.5,
+    "lighter_maker_entry_bps": 0.0,
+    "lighter_entry_bps": 2.0,
+    "lighter_exit_bps": 2.0,
+    "estimated_exit_slippage_per_leg_bps": 2.0
+  },
+  "risk": {
+    "max_open_positions": 5,
+    "max_total_notional_usd": 10000.0,
+    "max_notional_per_asset_usd": 2000.0,
+    "max_slippage_abort_bps": 10.0,
+    "plan_expiry_sec": 300
+  },
+  "alerts": {
+    "webhook_url": ""
+  }
+}
+

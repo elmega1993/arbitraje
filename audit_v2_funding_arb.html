@@ -1,0 +1,175 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); font-size: 14px; color: var(--color-text-primary); }
+.section { margin-bottom: 2rem; }
+.section-title { font-size: 16px; font-weight: 500; margin-bottom: 1rem; padding-bottom: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.item { display: grid; grid-template-columns: 88px 1fr; gap: 0 16px; padding: 12px 0; border-bottom: 0.5px solid var(--color-border-tertiary); align-items: start; }
+.item:last-child { border-bottom: none; }
+.badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 99px; text-align: center; white-space: nowrap; }
+.badge-fixed  { background: #EAF3DE; color: #3B6D11; }
+.badge-high   { background: #FAEEDA; color: #854F0B; }
+.badge-medium { background: #E6F1FB; color: #185FA5; }
+.badge-low    { background: #EEEDFE; color: #534AB7; }
+.badge-remain { background: #FCEBEB; color: #A32D2D; }
+.badge-obs    { background: #F1EFE8; color: #5F5E5A; }
+.item-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+.item-body { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+.item-file { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
+code { font-family: var(--font-mono); font-size: 11px; background: var(--color-background-secondary); padding: 1px 5px; border-radius: 4px; }
+.summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 2rem; }
+.stat { background: var(--color-background-secondary); border-radius: 8px; padding: 12px; }
+.stat-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.stat-val { font-size: 22px; font-weight: 500; }
+.c-green { color: #3B6D11; }
+.c-red   { color: #A32D2D; }
+.c-amber { color: #854F0B; }
+.c-blue  { color: #185FA5; }
+.fix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.5rem; }
+.fix-item { background: var(--color-background-secondary); border-radius: 8px; padding: 10px 12px; display: flex; align-items: flex-start; gap: 10px; }
+.fix-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.fix-dot-green { background: #639922; }
+.fix-dot-red   { background: #E24B4A; }
+.fix-dot-amber { background: #BA7517; }
+.fix-label { font-size: 12px; font-weight: 500; }
+.fix-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+</style>
+
+<div style="padding: 1rem 0;">
+
+<div class="summary-grid">
+  <div class="stat"><div class="stat-label">Cerrados vs auditoría 1</div><div class="stat-val c-green">11</div></div>
+  <div class="stat"><div class="stat-label">Aún pendientes</div><div class="stat-val c-red">3</div></div>
+  <div class="stat"><div class="stat-label">Nuevos (esta versión)</div><div class="stat-val c-amber">5</div></div>
+  <div class="stat"><div class="stat-label">Observaciones nuevas</div><div class="stat-val c-blue">3</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Delta vs auditoría 1 — qué se arregló</div>
+  <div class="fix-grid">
+    <div class="fix-item"><div class="fix-dot fix-dot-green"></div><div><div class="fix-label">C1 · Leg parcial sin hedge</div><div class="fix-sub">Ahora intenta cancel_all + log ALERT_PARTIAL_FILL</div></div></div>
+    <div class="fix-item"><div class="fix-dot fix-dot-green"></div><div><div class="fix-label">C2 · DB leak en execute_trade</div><div class="fix-sub">try/finally conn.close() correcto</div></div></div>
+    <div class="fix-item"><div class="fix-dot fix-dot-green"></div><div><div class="fix-label">C3 · DB_INITIALIZED race condition</div><div class="fix-sub">_DB_INIT_LOCK + double-check pattern</div></div></div>
+    <div class="fix-item"><div class="fix-dot fix-dot-green"></div><div><div class="fix-label">C4 · CACHE_LOCK inconsistente</div><div class="fix-sub">_store_cache usa CACHE_LOCK módulo</div></div></div>
+    <div class="fix-item"><div class="fix-dot fix-dot-green"></div><div><div class="fix-label">H1 · client_order_index hardcoded</div><div class="fix-sub">_derive_client_order_index(plan_id)</div></div></div>
+    <div class="fix-item"><div class="fix-dot fix-dot-green"></div><div><div class="fix-label">H2 · cancel_all arg inválido HL</div><div class="fix-sub">Ahora fetch open_orders + cancel por oid</div></div></div>
+    <div class="fix-item"><div class="fix-dot fix-dot-green"></div><div><div class="fix-label">H3 · asyncio event loop en FastAPI</div><div class="fix-sub">_run_async_in_thread con loop propio</div></div></div>
+    <div class="fix-item"><div class="fix-dot fix-dot-green"></div><div><div class="fix-label">H4 · Claves de riesgo faltantes</div><div class="fix-sub">Todas añadidas a config.json</div></div></div>
+    <div class="fix-item"><div class="fix-dot fix-dot-green"></div><div><div class="fix-label">H5 · szDecimals hardcoded HL</div><div class="fix-sub">_get_sz_decimals() con cache por asset</div></div></div>
+    <div class="fix-item"><div class="fix-dot fix-dot-green"></div><div><div class="fix-label">M3 · liquidity_ok == passes</div><div class="fix-sub">Ahora liquidity_ok = hl_liq_ok and lt_liq_ok</div></div></div>
+    <div class="fix-item"><div class="fix-dot fix-dot-green"></div><div><div class="fix-label">M4 + M5 + OBS O2 + OBS O3</div><div class="fix-sub">get_enriched_status cacheado, shortlist limpio, sign verificado, import duplicado removido</div></div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Aún pendientes de auditoría 1</div>
+
+  <div class="item">
+    <span><span class="badge badge-remain">PENDIENTE</span></span>
+    <div>
+      <div class="item-title">M1 · net_est_apy engañoso para holds cortos</div>
+      <div class="item-body">La fórmula <code>net_est_apy = carry_apy - (cost_pct * 100)</code> sigue igual. Resta el costo roundtrip (evento único) de un APY anualizado, lo que produce valores absurdos para holds de 24h. El CHANGELOG lo menciona como bug conocido ("BTC showing Net APY -42%") pero la fórmula no cambió. La métrica operativamente correcta ya está calculada: <code>expected_net_pct_hold</code> — sólo falta usar esa en los filtros y el dashboard en lugar de net_est_apy.</div>
+      <div class="item-file">funding_arb_bot.py:1112, 1210 · calc_signal() / apply_liquidity_checks()</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <span><span class="badge badge-remain">PENDIENTE</span></span>
+    <div>
+      <div class="item-title">M2 · Double-counting de slippage de salida</div>
+      <div class="item-body"><code>total_cost_bps</code> suma <code>hl_slippage + lt_slippage</code> (de libros live, entrada) más <code>2 × estimated_slippage_per_leg_bps</code>. El comment dice "exit slippage remains an estimate" pero el config field se llama <code>estimated_slippage_per_leg_bps</code> sin distinguir entry/exit. Con el config actual (2.0 bps por pata) esto agrega 4 bps de slippage de salida estimado encima del slippage de entrada real. Si el campo ya cubre ambas patas, la salida se cuenta doble. Documentar explícitamente qué cubre o separar en <code>estimated_exit_slippage_per_leg_bps</code>.</div>
+      <div class="item-file">funding_arb_bot.py:1195–1204 · apply_liquidity_checks()</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <span><span class="badge badge-remain">PENDIENTE</span></span>
+    <div>
+      <div class="item-title">O1 · execute_trade no re-valida la señal</div>
+      <div class="item-body">Hay un <code>TODO (O1)</code> en el código reconociendo el problema, pero no está implementado. El plan puede tener hasta <code>plan_expiry_sec=300s</code> de antigüedad al ejecutar. Un snapshot rápido del spread actual (sin abrir posición) antes de enviar las órdenes costaría ~200ms y podría evitar entrar con el funding ya invertido.</div>
+      <div class="item-file">funding_arb_bot.py:1397–1399 · execute_trade()</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Nuevos — bugs introducidos en esta versión</div>
+
+  <div class="item">
+    <span><span class="badge badge-high">ALTO</span></span>
+    <div>
+      <div class="item-title">N1 · prepare_trade filtra DB connection sin cerrar</div>
+      <div class="item-body"><code>conn = get_db()</code> se abre en línea 1389. El bloque <code>with conn:</code> hace commit/rollback pero en sqlite3 de Python <strong>no cierra la conexión</strong>. Luego la función retorna directamente sin <code>conn.close()</code>. A diferencia de <code>execute_trade</code> (que tiene <code>try/finally conn.close()</code>), <code>prepare_trade</code> no. Con múltiples llamadas desde el servidor FastAPI se acumulan conexiones abiertas. Fix: agregar <code>try/finally: conn.close()</code> igual que en execute_trade.</div>
+      <div class="item-file">funding_arb_bot.py:1389–1395 · prepare_trade()</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <span><span class="badge badge-high">ALTO</span></span>
+    <div>
+      <div class="item-title">N2 · Unwind de partial fill no cierra la posición — sólo cancela órdenes abiertas</div>
+      <div class="item-body">Cuando leg2 falla, el código llama <code>adapter1.cancel_all(symbol)</code>. Pero leg1 era una <strong>market order que ya llenó</strong>: no hay órdenes abiertas que cancelar. <code>cancel_all</code> en HL busca open orders con ese coin y las cancela — si no hay ninguna, retorna <code>True</code> silenciosamente. La posición filled sigue abierta y desnuda. El log <code>ALERT_PARTIAL_FILL</code> muestra <code>cancel_ok: True</code>, creando falsa sensación de éxito. Para cerrar una posición filled se necesita <code>market_close()</code> o una orden opuesta de igual size. El unwind actual es una ilusión.</div>
+      <div class="item-file">funding_arb_bot.py:1451–1458 · execute_trade() partial fill branch</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <span><span class="badge badge-medium">MEDIO</span></span>
+    <div>
+      <div class="item-title">N3 · RequestGate serializa threads bajo _lock durante sleep</div>
+      <div class="item-body"><code>RequestGate.acquire()</code> mantiene <code>_lock</code> adquirido durante todo <code>time.sleep(wait_sec)</code>. Con <code>max_concurrent=2</code>, el segundo thread que pasa el semaphore queda bloqueado en <code>_lock</code> hasta que el primero termine de dormir, luego duerme a su vez. En lugar de dos slots paralelos de 0.20s, se convierten en dos slots seriales de 0.40s total. Con 6 scan workers golpeando HL simultáneamente y un carry de 0.20s por request, el scan se hace significativamente más lento de lo esperado. Fix: calcular el wait sin sostener el lock, o usar un evento/condición.</div>
+      <div class="item-file">funding_arb_bot.py:59–67 · RequestGate.acquire()</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <span><span class="badge badge-medium">MEDIO</span></span>
+    <div>
+      <div class="item-title">N4 · log_error_detail abre una conexión SQLite por cada retry de HTTP</div>
+      <div class="item-body"><code>_http_json()</code> llama <code>log_error_detail()</code> en cada attempt fallido, que hace <code>get_db()</code> + insert + <code>conn.close()</code>. Con 6 workers y 4 retries por request, un 429 storm puede generar 24+ conexiones SQLite simultáneas en segundos. Además escribe al NDJSON file también. En la mayoría de casos esto funciona pero añade latencia al retry y puede causar contención en SQLite WAL mode. Considerar un buffer en memoria que persista en batch, o al menos reutilizar la conexión del caller.</div>
+      <div class="item-file">funding_arb_bot.py:132–177 · _http_json() + log_error_detail()</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <span><span class="badge badge-low">BAJO</span></span>
+    <div>
+      <div class="item-title">N5 · szDecimals de Lighter sigue hardcodeado a 4</div>
+      <div class="item-body">H5 fue arreglado en <code>HyperliquidAdapter</code> con <code>_get_sz_decimals()</code>, pero <code>LighterAdapter.place_market_order</code> todavía usa <code>round(size_usd / mid, 4)</code> fijo. Si Lighter requiere menos decimales para algún activo (como BTC con 3 decimales), la orden puede ser rechazada. Menor urgencia que HL porque Lighter hace menos validación on-chain de precision, pero vale la pena unificar.</div>
+      <div class="item-file">exchange_adapters.py · LighterAdapter.place_market_order()</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Observaciones nuevas — no bloquean, pero tienen costo</div>
+
+  <div class="item">
+    <span><span class="badge badge-obs">OBS</span></span>
+    <div>
+      <div class="item-title">O4 · log_structured_event llama ensure_db_initialized() dos veces</div>
+      <div class="item-body">Líneas 464 y 478 dentro de la misma función. El double-check lock hace que la segunda llamada sea un no-op, pero es ruido semántico. Esta función es llamada en cada evento, así que es fácil de limpiar.</div>
+      <div class="item-file">funding_arb_bot.py:464, 478 · log_structured_event()</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <span><span class="badge badge-obs">OBS</span></span>
+    <div>
+      <div class="item-title">O5 · _orderbook_cache (in-memory dict) sin lock</div>
+      <div class="item-body">El antiguo <code>_cache_lock</code> de instancia fue removido. Ahora <code>CACHE_LOCK</code> protege <code>self.cache</code> (el dict respaldado por SQLite), pero <code>self._orderbook_cache</code> (dict puro en memoria) se lee y escribe desde 6 workers concurrentes sin ningún lock. El GIL de CPython protege operaciones individuales de dict pero no secuencias read-check-write. En la práctica no hay crash, pero si se migra a PyPy o threading más agresivo, se vuelve un bug real.</div>
+      <div class="item-file">funding_arb_bot.py:717, 860–886 · MarketData._orderbook_cache</div>
+    </div>
+  </div>
+
+  <div class="item">
+    <span><span class="badge badge-obs">OBS</span></span>
+    <div>
+      <div class="item-title">O6 · ALERT_PARTIAL_FILL no tiene notificación en tiempo real</div>
+      <div class="item-body">El evento crítico "leg1 llenó, leg2 falló, posición desnuda" se guarda en SQLite y en el log de FastAPI, pero nadie recibe una alerta activa. Si el servidor está corriendo desatendido de noche, la exposición puede durar horas hasta el próximo <code>tail -f</code>. Para v0.6 es fundamental tener al menos un webhook/Telegram/curl a un endpoint externo en ese branch.</div>
+      <div class="item-file">funding_arb_bot.py:1461–1474 · execute_trade() ALERT_PARTIAL_FILL</div>
+    </div>
+  </div>
+</div>
+
+</div>
