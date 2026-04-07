@@ -271,6 +271,21 @@ table {
   width: 100%;
   border-collapse: collapse;
 }
+.table-scroll {
+  max-height: 540px;
+  overflow-y: auto;
+  overflow-x: auto;
+  border-top: 1px solid var(--border);
+}
+.table-scroll table {
+  margin-top: -1px;
+}
+.table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--surface);
+}
 th, td {
   padding: 13px 12px;
   border-bottom: 1px solid var(--border);
@@ -536,22 +551,24 @@ tbody tr.active {
           <label class="pill" style="height:42px;padding:0 12px;align-self:flex-end;"><input type="checkbox" id="hideNeutral" style="margin-right:8px;">Ocultar neutral</label>
         </div>
       </div>
-      <table>
-        <thead>
-          <tr id="opTableHeader">
-            <th class="sortable" data-sort="symbol">Asset</th>
-            <th class="sortable" data-sort="trade">Trade</th>
-            <th class="right sortable" data-sort="gross_apy">Gross APY</th>
-            <th class="right sortable" data-sort="net_est_apy" title="APY anual - Costo Único (Hold period)">Net APY</th>
-            <th class="right sortable" data-sort="expected_cost_pct_hold">Cost</th>
-            <th class="right sortable" data-sort="consistency_pct">Consistency</th>
-            <th>Liquidity</th>
-          </tr>
-        </thead>
-        <tbody id="opportunitiesBody">
-          <tr><td colspan="7" class="empty">Cargando oportunidades...</td></tr>
-        </tbody>
-      </table>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr id="opTableHeader">
+              <th class="sortable" data-sort="symbol">Asset</th>
+              <th class="sortable" data-sort="trade">Trade</th>
+              <th class="right sortable" data-sort="gross_apy">Gross APY</th>
+              <th class="right sortable" data-sort="net_est_apy" title="APY anual - Costo Único (Hold period)">Net APY</th>
+              <th class="right sortable" data-sort="expected_cost_pct_hold">Cost</th>
+              <th class="right sortable" data-sort="consistency_pct">Consistency</th>
+              <th>Liquidity</th>
+            </tr>
+          </thead>
+          <tbody id="opportunitiesBody">
+            <tr><td colspan="7" class="empty">Cargando oportunidades...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div class="card section">
