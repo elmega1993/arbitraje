@@ -542,10 +542,10 @@ tbody tr.active {
   <div class="topbar">
     <div class="titleblock">
       <h1>Funding Arb Control</h1>
-      <p>Scanner simple de oportunidades entre Hyperliquid y Lighter, con detalle del delta neutral y seguimiento del bot paper en tiempo real.</p>
+      <p>Monitor de oportunidades entre Hyperliquid y Lighter, con detalle de carry delta neutral y seguimiento del bot paper en tiempo real.</p>
     </div>
     <div class="pillrow">
-      <div class="pill" id="killSwitchBtn" style="cursor: pointer; transition: all 0.2s;"><span class="dot" id="killSwitchDot"></span><span id="killSwitchStatus">Kill Switch: ...</span></div>
+      <div class="pill" id="killSwitchBtn" style="cursor: pointer; transition: all 0.2s;"><span class="dot" id="killSwitchDot"></span><span id="killSwitchStatus">Bloqueo global: ...</span></div>
       <div class="pill"><span class="dot" id="serverDot"></span><span id="serverStatus">Server</span></div>
       <div class="pill"><span class="dot" id="backendDot"></span><span id="backendStatus">Backend privado</span></div>
       <div class="pill"><span id="refreshStamp">Sin refresh</span></div>
@@ -559,24 +559,24 @@ tbody tr.active {
       <div class="hero-sub" id="heroSub">Seleccioná un activo del scanner para ver el carry histórico, el costo de entrada y la lectura operativa del bot delta neutral.</div>
       <div class="hero-kpis">
         <div class="mini">
-          <div class="label">NET APY</div>
+          <div class="label">Retorno Neto</div>
           <div class="value neu" id="heroNetApy">—</div>
-          <div class="sub" id="heroNetApySub">Proyección neta anual (Hold)</div>
+          <div class="sub" id="heroNetApySub">Proyección anual neta</div>
         </div>
         <div class="mini">
-          <div class="label">Entry Cost</div>
+          <div class="label">Costo Total</div>
           <div class="value neu" id="heroCost">—</div>
           <div class="sub" id="heroCostSub">Fees + slippage</div>
         </div>
         <div class="mini">
-          <div class="label">Consistency</div>
+          <div class="label">Consistencia</div>
           <div class="value neu" id="heroConsistency">—</div>
           <div class="sub" id="heroConsistencySub">Persistencia de la señal</div>
         </div>
         <div class="mini">
-          <div class="label">Execution</div>
+          <div class="label">Estado</div>
           <div class="value neu" id="heroExecution">—</div>
-          <div class="sub" id="heroExecutionSub">Liquidez y decisión</div>
+          <div class="sub" id="heroExecutionSub">Lectura operativa</div>
         </div>
       </div>
     </div>
@@ -587,12 +587,12 @@ tbody tr.active {
         <div class="sub" id="walletSub">HL: — · LT: —</div>
       </div>
       <div class="statusbox warn" id="botStateBox">
-        <div class="label">Bot Delta Neutral</div>
+        <div class="label">Bot Paper</div>
         <div class="value" id="botStateValue">Sin posiciones</div>
         <div class="sub" id="botStateSub">Esperando estado del bot</div>
       </div>
       <div class="statusbox" id="riskStateBox">
-        <div class="label">Tracking</div>
+        <div class="label">Riesgo / PnL</div>
         <div class="value" id="riskStateValue">—</div>
         <div class="sub" id="riskStateSub">Hedge, drift y PnL neto</div>
       </div>
@@ -613,8 +613,8 @@ tbody tr.active {
     <div class="card section">
       <div class="sectionhead">
         <div>
-          <h2>Opportunities</h2>
-          <p>Lista rápida de activos operables. Click para cargar detalle y ver si el bot podría ejecutar delta neutral.</p>
+          <h2>Oportunidades</h2>
+          <p>Activos operables ahora. Hacé click para cargar el detalle y evaluar entrada delta neutral.</p>
         </div>
         <div class="filters">
           <div style="display:flex;flex-direction:column;gap:2px;">
@@ -642,7 +642,7 @@ tbody tr.active {
               <th class="right sortable" data-sort="net_est_apy" title="APY anual - Costo Único (Hold period)">Net APY</th>
               <th class="right sortable" data-sort="expected_cost_pct_hold">Cost</th>
               <th class="right sortable" data-sort="consistency_pct">Consistency</th>
-              <th>Liquidity</th>
+              <th>Liquidez</th>
             </tr>
           </thead>
           <tbody id="opportunitiesBody">
@@ -656,7 +656,7 @@ tbody tr.active {
       <div class="sectionhead">
         <div>
           <h2>Bot</h2>
-          <p>Posiciones paper activas y estado del hedge.</p>
+          <p>Posiciones paper activas y calidad actual del hedge.</p>
         </div>
       </div>
       <div class="table-scroll medium">
@@ -667,8 +667,8 @@ tbody tr.active {
               <th>Risk</th>
               <th class="right">Hedged</th>
               <th class="right">Unhedged</th>
-              <th class="right">BE Days</th>
-              <th class="right">Net PnL</th>
+              <th class="right">Recup. días</th>
+              <th class="right">PnL Neto</th>
               <th>Acción</th>
             </tr>
           </thead>
@@ -677,7 +677,7 @@ tbody tr.active {
           </tbody>
         </table>
       </div>
-      <div class="notice" id="botNotice">El panel del bot resume la calidad del hedge. Si `unhedged` crece o el `drift` domina, el bot paper quedó desbalanceado.</div>
+      <div class="notice" id="botNotice">Si `unhedged` crece o el `drift` domina, el hedge paper quedó desbalanceado y conviene revisar la posición.</div>
     </div>
   </div>
 
@@ -696,7 +696,7 @@ tbody tr.active {
 
       <div class="detail-grid">
         <div class="metric">
-          <div class="label">Spread Actual</div>
+          <div class="label">Spread Ahora</div>
           <div class="value neu" id="metricSpreadNow">—</div>
           <div class="sub" id="metricSpreadSub">HL - Lighter</div>
         </div>
@@ -706,12 +706,12 @@ tbody tr.active {
           <div class="sub" id="metricSpreadAvgSub">Carry histórico</div>
         </div>
         <div class="metric">
-          <div class="label">Break Even</div>
+          <div class="label">Punto de Equilibrio</div>
           <div class="value neu" id="metricBreakEven">—</div>
           <div class="sub" id="metricBreakEvenSub">Tiempo mínimo para cubrir costos</div>
         </div>
         <div class="metric">
-          <div class="label">Max Drawdown</div>
+          <div class="label">Drawdown Máximo</div>
           <div class="value neu" id="metricDrawdown">—</div>
           <div class="sub" id="metricDrawdownSub">Estrés histórico del carry</div>
         </div>
@@ -750,9 +750,9 @@ tbody tr.active {
         </select>
       </div>
       <div class="actions">
-        <button class="btn" id="prepareTradeBtn" style="border-color: var(--accent); color: var(--accent); font-weight: bold;">Prepare Trade (Real)</button>
+        <button class="btn" id="prepareTradeBtn" style="border-color: var(--accent); color: var(--accent); font-weight: bold;">Preparar trade real</button>
         <button class="btn primary" id="paperOpenBtn">Abrir paper</button>
-        <button class="btn" id="preTradeBtn">Pre-trade check</button>
+        <button class="btn" id="preTradeBtn">Chequeo previo</button>
       </div>
       <div class="notice" id="detailNotice">El trade correcto para delta neutral es siempre: long en el venue que paga menos funding y short en el que paga más.</div>
     </div>
@@ -760,19 +760,19 @@ tbody tr.active {
     <div class="card section">
       <div class="sectionhead">
         <div>
-          <h2>Tracking</h2>
-          <p>Cómo va el bot en este momento y qué está pasando con el hedge.</p>
+          <h2>Seguimiento</h2>
+          <p>Cómo viene el bot ahora y qué está pasando con el hedge.</p>
         </div>
       </div>
 
       <div class="detail-grid">
         <div class="metric">
-          <div class="label">Funding PnL</div>
+          <div class="label">PnL Funding</div>
           <div class="value neu" id="trackFundingPnl">—</div>
           <div class="sub">Funding acumulado de posiciones abiertas</div>
         </div>
         <div class="metric">
-          <div class="label">Net PnL</div>
+          <div class="label">PnL Neto</div>
           <div class="value neu" id="trackNetPnl">—</div>
           <div class="sub">Funding - costos - drift</div>
         </div>
@@ -811,8 +811,8 @@ tbody tr.active {
     <div class="card section">
       <div class="sectionhead">
         <div>
-          <h2>Error Log</h2>
-          <p>Últimos errores del bot y de los proveedores, con contexto grabado tanto en SQLite como en <code>logs/bot_errors.ndjson</code>.</p>
+          <h2>Errores Recientes</h2>
+          <p>Últimos errores del bot y de proveedores, guardados tanto en SQLite como en <code>logs/bot_errors.ndjson</code>.</p>
         </div>
         <div class="error-toolbar">
           <select id="errorSourceFilter">
@@ -1290,7 +1290,7 @@ function botHealthSummary(positions) {
     return {
       stateTone: "warn",
       stateValue: "Sin posiciones",
-      stateSub: "El bot paper todavía no tiene hedge abierto",
+      stateSub: "El bot paper todavía no tiene cobertura abierta",
       riskTone: "warn",
       riskValue: "Idle",
       riskSub: "No hay delta neutral corriendo"
@@ -1356,8 +1356,8 @@ function renderHero() {
     setClass($("heroConsistency"), signal.consistency_pct - 65);
   }
 
-  $("heroNetApySub").textContent = signal ? "APY neto proyectado incluyendo entrada/salida" : "Proyección neta anual (Hold)";
-  $("heroCostSub").textContent = signal ? `Roundtrip ${fmtBps(signal.total_cost_bps)}` : "Fees + slippage";
+  $("heroNetApySub").textContent = signal ? "Retorno neto proyectado incluyendo entrada y salida" : "Proyección anual neta";
+  $("heroCostSub").textContent = signal ? `Costo total ${fmtBps(signal.total_cost_bps)}` : "Fees + slippage";
   $("heroConsistencySub").textContent = signal ? `${signal.longest_streak_hours}h de racha máxima` : "Persistencia de la señal";
   $("heroExecutionSub").textContent = action.sub;
 
@@ -1573,7 +1573,7 @@ function renderDetail() {
       <div class="summary-pill ${action.tone}">${action.label}</div>
       <div class="summary-pill ${signal.liquidity_ok ? "good" : signal.liquidity_ok === false ? "bad" : "neu"}">${signal.liquidity_ok ? "Liquidez OK" : signal.liquidity_ok === false ? "Liquidez fina" : "Liquidez ?"}</div>
       <div class="summary-pill neu">${signal.samples} muestras</div>
-      <div class="summary-pill ${signal.net_est_apy >= 0 ? "good" : "bad"}">Net APY ${fmtPct(signal.net_est_apy, 2)}</div>
+      <div class="summary-pill ${signal.net_est_apy >= 0 ? "good" : "bad"}">Retorno ${fmtPct(signal.net_est_apy, 2)}</div>
     `
     : '<div class="summary-pill neu">Sin selección</div>';
 
@@ -1588,8 +1588,8 @@ function renderDetail() {
   }
 
   $("metricSpreadSub").textContent = signal ? `HL ${fmtPct((signal.current_hl_rate || 0) * 100, 4)} vs LT ${fmtPct((signal.current_lt_rate || 0) * 100, 4)}` : "HL - Lighter";
-  $("metricSpreadAvgSub").textContent = signal ? `Net APY ${fmtPct(signal.net_est_apy, 1)}` : "Carry histórico";
-  $("metricBreakEvenSub").textContent = signal ? `Expected net hold ${fmtPct(signal.expected_net_pct_hold, 2)}` : "Tiempo mínimo para cubrir costos";
+  $("metricSpreadAvgSub").textContent = signal ? `Retorno neto ${fmtPct(signal.net_est_apy, 1)}` : "Carry histórico";
+  $("metricBreakEvenSub").textContent = signal ? `Retorno esperado ${fmtPct(signal.expected_net_pct_hold, 2)}` : "Tiempo mínimo para cubrir costos";
   $("metricDrawdownSub").textContent = pairStats ? `${pairStats.pairs} muestras alineadas` : "Estrés histórico del carry";
 
   $("hlRate").textContent = signal ? fmtPct((signal.current_hl_rate || 0) * 100, 4) : "—";
@@ -1875,8 +1875,8 @@ async function handlePreTrade() {
   const result = await safeFetchJson(`/api/inspect/${encodeURIComponent(selectedAsset)}?hours=${selectedHours}`);
   const signal = result?.signal;
   $("detailNotice").textContent = signal
-    ? `Pre-trade visual: ${signal.trade} · net APY ${fmtPct(signal.net_est_apy, 1)} · liquidity ${signal.liquidity_ok ? "OK" : "insuficiente"}`
-    : "No hubo señal de pre-trade o la API local no respondió.";
+    ? `Chequeo previo visual: ${signal.trade} · retorno neto ${fmtPct(signal.net_est_apy, 1)} · liquidez ${signal.liquidity_ok ? "OK" : "insuficiente"}`
+    : "No hubo señal de chequeo previo o la API local no respondió.";
 }
 
 // Kill Switch logic
@@ -1890,20 +1890,20 @@ function renderKillSwitch() {
   const st = $("killSwitchStatus");
   if (killSwitchActive) {
     dot.className = "dot bad";
-    st.textContent = "Kill Switch: BLOCKED";
+    st.textContent = "Bloqueo global: ACTIVO";
     $("killSwitchBtn").style.borderColor = "var(--danger)";
     $("killSwitchBtn").style.color = "var(--danger)";
     $("killSwitchBtn").style.background = "var(--danger-soft)";
   } else {
     dot.className = "dot good";
-    st.textContent = "Kill Switch: ALLOWED";
+    st.textContent = "Bloqueo global: DESACTIVADO";
     $("killSwitchBtn").style.borderColor = "var(--good)";
     $("killSwitchBtn").style.color = "var(--good)";
     $("killSwitchBtn").style.background = "var(--good-soft)";
   }
 }
 async function toggleKillSwitch() {
-  $("killSwitchStatus").textContent = "Wait...";
+  $("killSwitchStatus").textContent = "Actualizando...";
   const res = await safeFetchJsonWithTimeout("/api/kill-switch", 5000, {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ active: !killSwitchActive })
@@ -1938,7 +1938,7 @@ async function handlePrepareTrade() {
       : "Error al preparar trade: " + e.message;
     alert(msg);
   } finally {
-    $("prepareTradeBtn").textContent = "Prepare Trade (Real)";
+    $("prepareTradeBtn").textContent = "Preparar trade real";
     $("prepareTradeBtn").disabled = false;
   }
 }
