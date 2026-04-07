@@ -481,36 +481,9 @@ tbody tr.active {
           <div class="label">Execution</div>
           <div class="value neu" id="heroExecution">—</div>
           <div class="sub" id="heroExecutionSub">Liquidez y decisión</div>
-  </div>
-</div>
-
-  <div class="grid" style="margin-top:16px;">
-    <div class="card section">
-      <div class="sectionhead">
-        <div>
-          <h2>Error Log</h2>
-          <p>Últimos errores del bot y de los proveedores, con contexto grabado tanto en SQLite como en <code>logs/bot_errors.ndjson</code>.</p>
         </div>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Hora</th>
-            <th>Fuente</th>
-            <th>Acción</th>
-            <th>Código</th>
-            <th>Error</th>
-          </tr>
-        </thead>
-        <tbody id="errorLogBody">
-          <tr><td colspan="5" class="empty">Sin errores recientes.</td></tr>
-        </tbody>
-      </table>
-      <div class="notice" id="errorLogNotice">Usá `funding_arb_bot.py recent-errors` para ver el registro completo.</div>
     </div>
-  </div>
-</div>
-
     <div class="card hero-side">
       <div class="statusbox" id="walletBox" style="background:var(--accent-soft);border-color:#a7d5d2;">
         <div class="label">Wallet</div>
@@ -724,6 +697,32 @@ tbody tr.active {
           <tr><td colspan="5" class="empty">Sin tracking activo todavía.</td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:16px;">
+    <div class="card section">
+      <div class="sectionhead">
+        <div>
+          <h2>Error Log</h2>
+          <p>Últimos errores del bot y de los proveedores, con contexto grabado tanto en SQLite como en <code>logs/bot_errors.ndjson</code>.</p>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Hora</th>
+            <th>Fuente</th>
+            <th>Acción</th>
+            <th>Código</th>
+            <th>Error</th>
+          </tr>
+        </thead>
+        <tbody id="errorLogBody">
+          <tr><td colspan="5" class="empty">Sin errores recientes.</td></tr>
+        </tbody>
+      </table>
+      <div class="notice" id="errorLogNotice">Usá `funding_arb_bot.py recent-errors` para ver el registro completo.</div>
     </div>
   </div>
 </div>
