@@ -277,6 +277,12 @@ table {
   overflow-x: auto;
   border-top: 1px solid var(--border);
 }
+.table-scroll.medium {
+  max-height: 360px;
+}
+.table-scroll.small {
+  max-height: 280px;
+}
 .table-scroll table {
   margin-top: -1px;
 }
@@ -578,21 +584,23 @@ tbody tr.active {
           <p>Posiciones paper activas y estado del hedge.</p>
         </div>
       </div>
-      <table class="bot-table">
-        <thead>
-          <tr>
-            <th>Asset</th>
-            <th class="right">Hedged</th>
-            <th class="right">Unhedged</th>
-            <th class="right">BE Days</th>
-            <th class="right">Net PnL</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody id="botPositionsBody">
-          <tr><td colspan="7" class="empty">Sin posiciones abiertas.</td></tr>
-        </tbody>
-      </table>
+      <div class="table-scroll medium">
+        <table class="bot-table">
+          <thead>
+            <tr>
+              <th>Asset</th>
+              <th class="right">Hedged</th>
+              <th class="right">Unhedged</th>
+              <th class="right">BE Days</th>
+              <th class="right">Net PnL</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="botPositionsBody">
+            <tr><td colspan="7" class="empty">Sin posiciones abiertas.</td></tr>
+          </tbody>
+        </table>
+      </div>
       <div class="notice" id="botNotice">El panel del bot resume la calidad del hedge. Si `unhedged` crece o el `drift` domina, el bot paper quedó desbalanceado.</div>
     </div>
   </div>
@@ -700,20 +708,22 @@ tbody tr.active {
         </div>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Asset</th>
-            <th class="right">Funding</th>
-            <th class="right">Cost</th>
-            <th class="right">Drift</th>
-            <th class="right">Delay</th>
-          </tr>
-        </thead>
-        <tbody id="trackingBody">
-          <tr><td colspan="5" class="empty">Sin tracking activo todavía.</td></tr>
-        </tbody>
-      </table>
+      <div class="table-scroll small">
+        <table>
+          <thead>
+            <tr>
+              <th>Asset</th>
+              <th class="right">Funding</th>
+              <th class="right">Cost</th>
+              <th class="right">Drift</th>
+              <th class="right">Delay</th>
+            </tr>
+          </thead>
+          <tbody id="trackingBody">
+            <tr><td colspan="5" class="empty">Sin tracking activo todavía.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -725,20 +735,22 @@ tbody tr.active {
           <p>Últimos errores del bot y de los proveedores, con contexto grabado tanto en SQLite como en <code>logs/bot_errors.ndjson</code>.</p>
         </div>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Hora</th>
-            <th>Fuente</th>
-            <th>Acción</th>
-            <th>Código</th>
-            <th>Error</th>
-          </tr>
-        </thead>
-        <tbody id="errorLogBody">
-          <tr><td colspan="5" class="empty">Sin errores recientes.</td></tr>
-        </tbody>
-      </table>
+      <div class="table-scroll medium">
+        <table>
+          <thead>
+            <tr>
+              <th>Hora</th>
+              <th>Fuente</th>
+              <th>Acción</th>
+              <th>Código</th>
+              <th>Error</th>
+            </tr>
+          </thead>
+          <tbody id="errorLogBody">
+            <tr><td colspan="5" class="empty">Sin errores recientes.</td></tr>
+          </tbody>
+        </table>
+      </div>
       <div class="notice" id="errorLogNotice">Usá `funding_arb_bot.py recent-errors` para ver el registro completo.</div>
     </div>
   </div>
