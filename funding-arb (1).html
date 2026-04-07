@@ -348,10 +348,85 @@ tbody tr.active {
 .badge.good { background: var(--good-soft); color: var(--good); }
 .badge.warn { background: var(--warn-soft); color: var(--warn); }
 .badge.bad { background: var(--danger-soft); color: var(--danger); }
+.badge.neu { background: #eef2f7; color: #475569; }
 .muted { color: var(--muted); }
 .pos { color: var(--good); }
 .neg { color: var(--danger); }
 .neu { color: var(--muted); }
+.detail-summary {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.summary-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--muted);
+}
+.summary-pill.good {
+  background: var(--good-soft);
+  color: var(--good);
+  border-color: #b7e3c0;
+}
+.summary-pill.warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+  border-color: #f0dc92;
+}
+.summary-pill.bad {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: #fdc89e;
+}
+.summary-pill.neu {
+  background: #eef2f7;
+  color: #475569;
+}
+.row-risk {
+  border-left: 4px solid transparent;
+}
+.row-risk.warn {
+  border-left-color: #f59e0b;
+}
+.row-risk.bad {
+  border-left-color: #dc2626;
+}
+.error-toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.error-toolbar select {
+  min-width: 160px;
+}
+.error-message {
+  max-width: 420px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.error-message.expanded {
+  white-space: normal;
+  overflow: visible;
+}
+.link-btn {
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+}
 .detail-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -589,6 +664,7 @@ tbody tr.active {
           <thead>
             <tr>
               <th>Asset</th>
+              <th>Risk</th>
               <th class="right">Hedged</th>
               <th class="right">Unhedged</th>
               <th class="right">BE Days</th>
@@ -612,6 +688,10 @@ tbody tr.active {
           <h2>Detalle</h2>
           <p id="detailSubtitle">Funding histórico, delta entre venues y lectura táctica del activo seleccionado.</p>
         </div>
+      </div>
+
+      <div class="detail-summary" id="detailSummary">
+        <div class="summary-pill neu">Sin selección</div>
       </div>
 
       <div class="detail-grid">
@@ -734,6 +814,12 @@ tbody tr.active {
           <h2>Error Log</h2>
           <p>Últimos errores del bot y de los proveedores, con contexto grabado tanto en SQLite como en <code>logs/bot_errors.ndjson</code>.</p>
         </div>
+        <div class="error-toolbar">
+          <select id="errorSourceFilter">
+            <option value="all">Todas las fuentes</option>
+          </select>
+          <button class="btn" id="errorExpandBtn">Ver más</button>
+        </div>
       </div>
       <div class="table-scroll medium">
         <table>
@@ -771,6 +857,7 @@ let botStatus = [];
 let doctorPayload = null;
 let charts = { funding: null, spread: null };
 let errorRows = [];
+let errorRowsExpanded = false;
 let apiErrors = [];
 let publicAssets = [];
 let publicLtMarkets = null;
@@ -1362,20 +1449,28 @@ function renderOpportunities() {
 function renderBotPositions() {
   const tbody = $("botPositionsBody");
   if (!botStatus.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="empty">Sin posiciones abiertas.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">Sin posiciones abiertas.</td></tr>';
     return;
   }
 
-  tbody.innerHTML = botStatus.map((pos) => `
-    <tr>
+  tbody.innerHTML = botStatus.map((pos) => {
+    const unhedged = Number(pos.realtime_unhedged_usd || 0);
+    const net = Number(pos.realtime_net_pnl_usd || 0);
+    const riskTone = unhedged > 25 ? "bad" : unhedged > 0 ? "warn" : "good";
+    const riskLabel = unhedged > 25 ? "Expuesto" : unhedged > 0 ? "Parcial" : "Cubierto";
+    const rowTone = unhedged > 25 || net < -25 ? "bad" : unhedged > 0 ? "warn" : "";
+    return `
+    <tr class="row-risk ${rowTone}">
       <td><strong>${pos.symbol}</strong><div class="muted">${pos.trade}</div></td>
+      <td><span class="badge ${riskTone}">${riskLabel}</span></td>
       <td class="right mono">${fmtUsd(pos.realtime_hedged_usd)}</td>
-      <td class="right mono ${Number(pos.realtime_unhedged_usd || 0) > 0 ? "neg" : "neu"}">${fmtUsd(pos.realtime_unhedged_usd)}</td>
+      <td class="right mono ${unhedged > 0 ? "neg" : "neu"}">${fmtUsd(pos.realtime_unhedged_usd)}</td>
       <td class="right mono">${calcBreakEvenDaysFromPosition(pos) === null ? "—" : `${calcBreakEvenDaysFromPosition(pos).toFixed(2)} d`}</td>
-      <td class="right mono ${Number(pos.realtime_net_pnl_usd || 0) >= 0 ? "pos" : "neg"}">${fmtUsd(pos.realtime_net_pnl_usd)}</td>
+      <td class="right mono ${net >= 0 ? "pos" : "neg"}">${fmtUsd(pos.realtime_net_pnl_usd)}</td>
       <td><button class="btn" data-close-symbol="${pos.symbol}">Cerrar</button></td>
     </tr>
-  `).join("");
+  `;
+  }).join("");
   [...tbody.querySelectorAll("[data-close-symbol]")].forEach((button) => {
     button.addEventListener("click", async () => handlePaperClose(button.dataset.closeSymbol));
   });
@@ -1415,42 +1510,72 @@ function renderTracking() {
 
 function renderErrorLog() {
   const tbody = $("errorLogBody");
-  if (!errorRows.length) {
+  const sourceFilter = $("errorSourceFilter").value || "all";
+  const filteredRows = errorRows.filter((row) => sourceFilter === "all" || (row.source || "unknown") === sourceFilter);
+  const visibleRows = errorRowsExpanded ? filteredRows : filteredRows.slice(0, 6);
+  if (!filteredRows.length) {
     tbody.innerHTML = '<tr><td colspan="5" class="empty">Sin errores recientes.</td></tr>';
+    $("errorExpandBtn").textContent = "Ver más";
     return;
   }
-  tbody.innerHTML = errorRows
-    .slice(0, 6)
+  $("errorExpandBtn").textContent = errorRowsExpanded && filteredRows.length > 6 ? "Ver menos" : "Ver más";
+  tbody.innerHTML = visibleRows
     .map((error) => {
       const timeStr = error.ts
         ? new Date(error.ts * 1000).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
         : "—";
+      const message = `${error.error_type}: ${error.error_message}`;
+      const expandable = message.length > 90;
       return `
         <tr>
           <td>${timeStr}</td>
           <td>${error.source || "—"}</td>
           <td>${error.operation}</td>
           <td>${error.status_code || "—"}</td>
-          <td>${error.error_type}: ${error.error_message}</td>
+          <td>
+            <div class="error-message">${message}</div>
+            ${expandable ? '<button class="link-btn" data-expand-error>expandir</button>' : ''}
+          </td>
         </tr>
       `;
     })
     .join("");
+  [...tbody.querySelectorAll("[data-expand-error]")].forEach((button) => {
+    button.addEventListener("click", () => {
+      const message = button.previousElementSibling;
+      message.classList.toggle("expanded");
+      button.textContent = message.classList.contains("expanded") ? "colapsar" : "expandir";
+    });
+  });
 }
 
 async function loadErrorLog(limit = 6) {
   const payload = await safeFetchJsonWithTimeout(`/api/errors?limit=${limit}`, 10000);
   errorRows = payload?.errors || [];
+  const sources = [...new Set(errorRows.map((row) => row.source || "unknown"))].sort();
+  const filter = $("errorSourceFilter");
+  const previous = filter.value || "all";
+  filter.innerHTML = '<option value="all">Todas las fuentes</option>' + sources.map((source) => `<option value="${source}">${source}</option>`).join("");
+  filter.value = sources.includes(previous) || previous === "all" ? previous : "all";
   renderErrorLog();
 }
 
 function renderDetail() {
   const signal = inspectPayload ? inspectPayload.signal : null;
   const pairStats = inspectPayload ? inspectPayload.pair_stats : null;
+  const action = signalAction(signal);
 
   $("detailSubtitle").textContent = signal
     ? `${signal.symbol} · ${signal.trade} · comparación directa entre venues`
     : "Funding histórico, delta entre venues y lectura táctica del activo seleccionado.";
+  $("detailSummary").innerHTML = signal
+    ? `
+      <div class="summary-pill ${action.tone}">${action.label}</div>
+      <div class="summary-pill ${signal.liquidity_ok ? "good" : signal.liquidity_ok === false ? "bad" : "neu"}">${signal.liquidity_ok ? "Liquidez OK" : signal.liquidity_ok === false ? "Liquidez fina" : "Liquidez ?"}</div>
+      <div class="summary-pill neu">${signal.samples} muestras</div>
+      <div class="summary-pill ${signal.net_est_apy >= 0 ? "good" : "bad"}">Net APY ${fmtPct(signal.net_est_apy, 2)}</div>
+    `
+    : '<div class="summary-pill neu">Sin selección</div>';
 
   $("metricSpreadNow").textContent = signal ? fmtPct((signal.current_spread || 0) * 100, 3) : "—";
   $("metricSpreadAvg").textContent = signal ? fmtPct((signal.avg_spread || 0) * 100, 3) : "—";
@@ -1853,6 +1978,11 @@ document.addEventListener("DOMContentLoaded", () => {
     $("detailNotice").textContent = `No se pudo actualizar el dashboard: ${error.message}`;
     console.error(error);
   }));
+  $("errorSourceFilter").addEventListener("change", () => renderErrorLog());
+  $("errorExpandBtn").addEventListener("click", () => {
+    errorRowsExpanded = !errorRowsExpanded;
+    renderErrorLog();
+  });
   $("assetSelect").addEventListener("change", async (event) => {
     if (isRefreshing) return;
     selectedAsset = event.target.value;
